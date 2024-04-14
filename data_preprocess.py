@@ -20,6 +20,7 @@ if not os.path.exists("./Data/raw_data"):
 # get valid company list
 company_list = []
 file = open("./valid_company.txt")
+#逐行读取有效公司名单，并添加到company_list
 while True:
     line = file.readline()
     line = line.replace("\n","")
@@ -111,6 +112,7 @@ def get_price_data(dir_path):
             line = line[0].split(',')
             if(line[0] >= '2013-12-24' and line[0] <= '2015-12-31'):
                 feature = []
+                #特征归一化，除以last_adj_close 标准化
                 feature.append(line[0])
                 feature.append(float(line[2])/last_adj_close)
                 feature.append(float(line[3])/last_adj_close)

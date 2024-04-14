@@ -93,6 +93,7 @@ file.close()
 ###############################
 
 # Read files from directory "[dir_path]/stocknet-dataset/price/raw"
+#从文件夹中读取股票数据
 def get_price_data(dir_path):
     # read raw data
     path = os.path.join(dir_path,"stocknet-dataset","price","raw")
@@ -125,6 +126,7 @@ def get_price_data(dir_path):
         dataset.append(data)
         
     # Add label
+    #按照标准判断是否为0/1--大概是按照return判断的
     idx = 0
     for data in dataset:
         for i in range(5,len(data)):

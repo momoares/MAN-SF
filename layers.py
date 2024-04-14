@@ -27,12 +27,13 @@ class GraphAttentionLayer(nn.Module):
     def forward(self, input, adj):
         h = torch.mm(input, self.W)
         N = h.size()[0]
-
+#拼对应位置计算分子
         a_input = torch.cat([h.repeat(1, N).view(N * N, -1), h.repeat(N, 1)], dim=1).view(N, -1, 2 * self.out_features)
         e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(2))
         zero_vec = -9e15*torch.ones_like(e)
         attention = torch.where(adj > 0, e, zero_vec)
         attention = F.softmax(attention, dim=1)
+#防止梯度消失
         attention = F.dropout(attention, self.dropout, training=self.training)
         h_prime = torch.matmul(attention, h)
 

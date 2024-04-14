@@ -74,6 +74,8 @@ class GAT(nn.Module):
             self.add_module('attention_{}'.format(i), attention)
 
         self.out_att = GraphAttentionLayer(nhid * nheads, nclass, dropout=dropout, alpha=alpha, concat=False)
+
+    
     def forward(self, text_input, price_input, adj):
         li = []
         num_tw = text_input.size(2)
@@ -95,6 +97,8 @@ class GAT(nn.Module):
             text = self.attnt[i](*text).reshape((1,64))
             combined = F.tanh(self.bilinear[i](text, x).reshape((1,64)))
             li.append(combined.reshape(1,64))
+#得到股票/推文的编码
+        
         ft_vec = torch.Tensor((num_stocks,64))
         ft_vec = torch.cat(li)
         out_1 = F.tanh(self.linear_x[i](ft_vec))

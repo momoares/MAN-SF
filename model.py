@@ -102,7 +102,9 @@ class GAT(nn.Module):
         ft_vec = torch.Tensor((num_stocks,64))
         ft_vec = torch.cat(li)
         out_1 = F.tanh(self.linear_x[i](ft_vec))
+        
         x = F.dropout(ft_vec, self.dropout, training=self.training)
+        #套进attention里头看看结果
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
         x = F.elu(self.out_att(x, adj))

@@ -18,6 +18,8 @@ class GraphAttentionLayer(nn.Module):
         self.concat = concat
 
         self.W = nn.Parameter(torch.zeros(size=(in_features, out_features)))
+        #nn.Parameter 是一个类，用于定义神经网络模型中的可训练参数。参数是被注册为模块参数的张量，
+        #因此在训练期间可以对其进行优化。使用 nn.Parameter 定义参数时，PyTorch会自动跟踪这些参数的梯度，
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
         self.a = nn.Parameter(torch.zeros(size=(2*out_features, 1)))
         nn.init.xavier_uniform_(self.a.data, gain=1.414)

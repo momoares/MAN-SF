@@ -21,6 +21,7 @@ class GraphAttentionLayer(nn.Module):
         #nn.Parameter 是一个类，用于定义神经网络模型中的可训练参数。参数是被注册为模块参数的张量，
         #因此在训练期间可以对其进行优化。使用 nn.Parameter 定义参数时，PyTorch会自动跟踪这些参数的梯度，
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
+        #Xavier均匀初始化方法初始化
         self.a = nn.Parameter(torch.zeros(size=(2*out_features, 1)))
         nn.init.xavier_uniform_(self.a.data, gain=1.414)
 
@@ -28,10 +29,19 @@ class GraphAttentionLayer(nn.Module):
 
     def forward(self, input, adj):
         h = torch.mm(input, self.W)
+        #torch.mm 矩阵相乘 torch.mul 对应位置相乘
+        #torch.bmm 维度大小必须相同；
+        #torch.matmul() 没有强制规定维度和大小，可以用利用广播机制进行不同维度的相乘操作
         N = h.size()[0]
+        
 #拼对应位置计算分子
         a_input = torch.cat([h.repeat(1, N).view(N * N, -1), h.repeat(N, 1)], dim=1).view(N, -1, 2 * self.out_features)
+       #torch.repeat 按照维度上给定的数重复
+        #view 视图 把矩阵拉成给定的维度（-1表示不确定，由其他维度拉完后计算得到）
         e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(2))
+        #unsqueeze 升维
+        #squeeze 将输入张量形状中的1去除并返回 a.squeeze() 把a的形状中为1的全去掉
+        #此处应该是看第三个维度是否为1，如果为1就去掉，不为1就不管        
         zero_vec = -9e15*torch.ones_like(e)
         attention = torch.where(adj > 0, e, zero_vec)
         attention = F.softmax(attention, dim=1)

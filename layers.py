@@ -43,10 +43,13 @@ class GraphAttentionLayer(nn.Module):
         #squeeze 将输入张量形状中的1去除并返回 a.squeeze() 把a的形状中为1的全去掉
         #此处应该是看第三个维度是否为1，如果为1就去掉，不为1就不管        
         zero_vec = -9e15*torch.ones_like(e)
+        #一个与e相同大小的 极大的负值张量（估计是用来给attention置0的）
         attention = torch.where(adj > 0, e, zero_vec)
+        #位置判断，若adj大于0，则取e中的值，否则取zero_vec的值（softmax后基本归为0）
         attention = F.softmax(attention, dim=1)
-#防止梯度消失
+
         attention = F.dropout(attention, self.dropout, training=self.training)
+        #防止梯度消失，在训练模式下，F.dropout 函数将会随机将 attention 张量中的部分元素设置为零
         h_prime = torch.matmul(attention, h)
 
         if self.concat:
